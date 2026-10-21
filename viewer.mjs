@@ -1,3 +1,5 @@
+import {watchProgress} from './live.mjs';
+import liveConfig from './live-config.mjs';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,filter='active',view='overview',busy=false;
 const types={0:'Основные задания',1:'Основные задания',2:'Дополнительные задания',3:'Ведьмачьи заказы',4:'Поиск сокровищ',6:'Каменные сердца',7:'Кровь и вино'};
@@ -37,4 +39,6 @@ function render(){const d=state,tracked=d.quests.find(q=>q.id===d.trackedId);$('
 function status(text,error=false){const box=$('viewer-status');box.classList.toggle('error',error);box.replaceChildren(el('span','',text));if(error){const retry=el('button','','Повторить');retry.onclick=poll;box.append(retry);}}
 async function poll(){if(busy)return;busy=true;try{const r=await fetch(document.documentElement.dataset.stateEndpoint||'progress.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('HTTP '+r.status);const body=await r.json();if(!body.data||!Array.isArray(body.data.quests))throw Error('Нет данных');state=body.data;render();const date=new Date(body.modified);status('Данные из игры: '+date.toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'. Обновляются примерно раз в 10 минут во время игры.');}catch{status(state?'Не удалось проверить обновления. Показаны сохранённые данные.':'Не удалось загрузить прохождение. Попробуй ещё раз.',true);}finally{busy=false;}}
 document.querySelector('.page-heading p').textContent='Квесты, прокачка и снаряжение — для тех, кто следит за приключением.';
-poll();setInterval(poll,60000);
+if(document.documentElement.dataset.platform==='github'){
+  watchProgress(liveConfig,body=>{state=body.data;render();status('Прогресс обновляется автоматически. После выхода из игры остаются последние данные.');},()=>{status(state?'Показан сохранённый прогресс. Восстанавливаем связь с обновлениями.':'Подключаемся к прохождению…');});
+}else{poll();setInterval(poll,5000);}
