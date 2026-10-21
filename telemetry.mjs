@@ -10,7 +10,12 @@ export function parseTelemetry(input){
     if(typeof d[key]!=='number'||!Number.isFinite(d[key]))throw Error('Некорректное поле '+key);
   }
   if(d.level<1||d.level>10000)throw Error('Некорректный уровень');
-  d.quests=d.quests.map(q=>({id:String(q.id),title:String(q.title).slice(0,1000),type:Number(q.type),world:String(q.world||''),status:['active','completed','failed','inactive'].includes(q.status)?q.status:'inactive'}));
+  const tasks=list=>list.slice(0,200).map(t=>({title:String(t.title||'').slice(0,2000),status:['active','completed','failed'].includes(t.status)?t.status:'active'}));
+  d.quests=d.quests.map(q=>({id:String(q.id),title:String(q.title).slice(0,1000),type:Number(q.type),world:String(q.world||''),status:['active','completed','failed','inactive'].includes(q.status)?q.status:'inactive',...(Number.isFinite(q.level)&&q.level>0?{level:q.level}:{}),...(typeof q.description==='string'?{description:q.description.slice(0,30000)}:{}),...(Array.isArray(q.objectives)?{objectives:tasks(q.objectives)}:{})}));
+  if(d.build&&typeof d.build==='object'){
+    const clean=list=>Array.isArray(list)?list.slice(0,40).map(x=>({title:String(x.title||'').slice(0,1000),slot:String(x.slot||'').slice(0,100),color:['red','green','blue','yellow'].includes(x.color)?x.color:'',group:Number.isFinite(x.group)?x.group:0,level:Number.isFinite(x.level)?x.level:0,maxLevel:Number.isFinite(x.maxLevel)?x.maxLevel:0})):[];
+    d.build={skills:clean(d.build.skills),mutagens:clean(d.build.mutagens),equipment:clean(d.build.equipment)};
+  }else delete d.build;
   d.objectives=Array.isArray(d.objectives)?d.objectives.map(x=>String(x).slice(0,2000)):[];
   return d;
 }
