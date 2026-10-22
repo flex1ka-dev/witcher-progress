@@ -5,3 +5,5 @@
 @media(hover:none){.game-item:hover>.game-tooltip{display:none}.game-item.pinned>.game-tooltip,.game-item:focus-within>.game-tooltip{display:block}}
 
 .game-item.dismissed>.game-tooltip{display:none!important}
+
+.socket-group-body.mutation-slots{display:block}.mutation-slots .skill-sockets{grid-template-columns:repeat(4,minmax(0,1fr))}
