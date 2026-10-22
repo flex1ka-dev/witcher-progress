@@ -1,5 +1,6 @@
 import {watchProgress} from './live.mjs';
 import liveConfig from './live-config.mjs';
+import {renderCharacter} from './character.mjs';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,filter='active',view='overview',busy=false;
 const types={0:'Основные задания',1:'Основные задания',2:'Дополнительные задания',3:'Ведьмачьи заказы',4:'Поиск сокровищ',6:'Каменные сердца',7:'Кровь и вино'};
@@ -35,7 +36,7 @@ function render(){const d=state,tracked=d.quests.find(q=>q.id===d.trackedId);$('
  $('quest-summary').textContent='Из '+d.quests.length+' открытых заданий';$('nav-count').textContent=d.quests.filter(q=>q.status==='active').length;
  $('tracked-title').textContent=tracked?.title||'Задание не выбрано';$('tracked-type').textContent=tracked?(types[tracked.type]||'Задание'):'ТЕКУЩАЯ ЦЕЛЬ';$('tracked-world').textContent=tracked?world(tracked)+(tracked.level?' · Уровень '+tracked.level:''):'В игровом журнале нет отслеживаемого задания.';$('objectives').replaceChildren(...(d.objectives||[]).map(t=>el('li','',plain(t))));
  for(const b of document.querySelectorAll('[data-filter]')){const n=b.dataset.filter;b.textContent=({active:'Активные',completed:'Завершённые',failed:'Проваленные',all:'Все'})[n]+' · '+d.quests.filter(q=>n==='all'||q.status===n).length;}
- $('character-details').replaceChildren(buildSection('Выбранные умения',d.build?.skills,'skills'),buildSection('Мутагены',d.build?.mutagens,'mutagens'),buildSection('Броня и оружие',d.build?.equipment,'equipment'));renderQuests();}
+ renderCharacter(d);renderQuests();}
 function status(text,error=false){const box=$('viewer-status');box.classList.toggle('error',error);box.replaceChildren(el('span','',text));if(error){const retry=el('button','','Повторить');retry.onclick=poll;box.append(retry);}}
 async function poll(){if(busy)return;busy=true;try{const r=await fetch(document.documentElement.dataset.stateEndpoint||'progress.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('HTTP '+r.status);const body=await r.json();if(!body.data||!Array.isArray(body.data.quests))throw Error('Нет данных');state=body.data;render();const date=new Date(body.modified);status('Данные из игры: '+date.toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'. Обновляются примерно раз в 10 минут во время игры.');}catch{status(state?'Не удалось проверить обновления. Показаны сохранённые данные.':'Не удалось загрузить прохождение. Попробуй ещё раз.',true);}finally{busy=false;}}
 document.querySelector('.page-heading p').textContent='Квесты, прокачка и снаряжение — для тех, кто следит за приключением.';

@@ -13,8 +13,19 @@ export function parseTelemetry(input){
   const tasks=list=>list.slice(0,200).map(t=>({title:String(t.title||'').slice(0,2000),status:['active','completed','failed'].includes(t.status)?t.status:'active'}));
   d.quests=d.quests.map(q=>({id:String(q.id),title:String(q.title).slice(0,1000),type:Number(q.type),world:String(q.world||''),status:['active','completed','failed','inactive'].includes(q.status)?q.status:'inactive',...(Number.isFinite(q.level)&&q.level>0?{level:q.level}:{}),...(typeof q.description==='string'?{description:q.description.slice(0,30000)}:{}),...(Array.isArray(q.objectives)?{objectives:tasks(q.objectives)}:{})}));
   if(d.build&&typeof d.build==='object'){
-    const clean=list=>Array.isArray(list)?list.slice(0,40).map(x=>({title:String(x.title||'').slice(0,1000),slot:String(x.slot||'').slice(0,100),color:['red','green','blue','yellow'].includes(x.color)?x.color:'',group:Number.isFinite(x.group)?x.group:0,level:Number.isFinite(x.level)?x.level:0,maxLevel:Number.isFinite(x.maxLevel)?x.maxLevel:0})):[];
-    d.build={skills:clean(d.build.skills),mutagens:clean(d.build.mutagens),equipment:clean(d.build.equipment)};
+    const clean=list=>Array.isArray(list)?list.slice(0,400).map(x=>{
+      const item={title:String(x.title||'').slice(0,1000),slot:String(x.slot||'').slice(0,100),color:['red','green','blue','yellow'].includes(x.color)?x.color:'',group:Number.isFinite(x.group)?x.group:0,level:Number.isFinite(x.level)?x.level:0,maxLevel:Number.isFinite(x.maxLevel)?x.maxLevel:0};
+      for(const k of ['id','icon','description','primaryLabel','primaryValue','weight'])if(x[k]!==undefined)item[k]=String(x[k]).slice(0,k==='description'?16000:500);
+      for(const k of ['slotId','row','column','links','quality','durability','socketCount'])if(Number.isFinite(x[k]))item[k]=x[k];
+      if(typeof x.active==='boolean')item.active=x.active;
+      if(Array.isArray(x.stats))item.stats=x.stats.slice(0,80).map(s=>({label:String(s.label||'').slice(0,1000),value:String(s.value||'').slice(0,500)}));
+      if(Array.isArray(x.sockets))item.sockets=x.sockets.slice(0,20).map(s=>String(s).slice(0,500));
+      return item;
+    }):[];
+    const build=d.build;
+    d.build={skills:clean(build.skills),mutagens:clean(build.mutagens),equipment:clean(build.equipment)};
+    if(build.detailsVersion===2)d.build.detailsVersion=2;
+    if(Array.isArray(build.slots))d.build.slots=build.slots.slice(0,60).map(s=>({id:Number(s.id)||0,skillId:String(s.skillId),group:Number(s.group)||0,unlocked:s.unlocked===true,unlockAt:Number(s.unlockAt)||0}));
   }else delete d.build;
   d.objectives=Array.isArray(d.objectives)?d.objectives.map(x=>String(x).slice(0,2000)):[];
   return d;

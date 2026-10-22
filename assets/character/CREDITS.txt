@@ -1,0 +1,4 @@
+Game icons: The Witcher 3, CD PROJEKT RED. Fan progress viewer, not affiliated.
+Skill/mutagen image source: https://github.com/Panglot/witcher-remastered-calculator/tree/main/public/assets/ui
+Equipment image source: https://witcherworkshop.com/
+Only images are used; calculator code and game statistics are not imported.
