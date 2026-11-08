@@ -15,3 +15,27 @@
 @media(max-width:420px){.build-grid{grid-template-columns:1fr}.breadcrumb{max-width:55%}.nav{font-size:11px}.tabs{flex-wrap:wrap}.tabs button{min-width:45%}.quest-body{padding:0 18px 20px}}
 
 #overview-view{display:flex;flex-direction:column}#overview-view .page-heading{order:0}#viewer-status{order:1}#overview-view .two-columns{order:2;margin:0 0 20px}#overview-view .hero{order:3}#overview-view .stats-grid{order:4}.current-panel{padding:22px 25px}.quest-feature{margin-top:18px}.objectives{margin-bottom:10px}.sidebar .nav{padding-left:8px;padding-right:8px;font-size:11px}
+/* Keep the title and navigation inside the sidebar's gutters. */
+.brand{gap:12px;font-size:18px;line-height:1.16;letter-spacing:1.2px}
+.brand-mark{flex:0 0 33px;font-size:38px;letter-spacing:0;padding-right:0;transform:none}
+.brand-name{min-width:0}
+.sidebar-caption{line-height:1.55}
+.topbar{gap:16px;min-height:58px;height:auto;padding-block:14px}
+.breadcrumb{min-width:0;line-height:1.5}
+.top-actions{flex-shrink:0}
+.quest-entry summary>span:not(.quest-level),.quest-feature>div{min-width:0;overflow-wrap:anywhere}
+.stat-label{display:block;padding-inline-end:24px;overflow-wrap:anywhere}
+@media(min-width:801px){.sidebar{width:220px}main{margin-left:220px}}
+@media(max-width:800px){
+  .brand{font-size:16px}
+  .brand-mark{flex-basis:28px;font-size:30px}
+  .sidebar .nav{min-width:0;flex:1;line-height:1.35}
+  .breadcrumb span{padding:0 5px}
+}
+@media(max-width:420px){
+  .topbar{gap:8px}
+  .top-actions{gap:5px}
+  .current-panel{padding:18px}
+  .hero-copy{padding-inline-end:56px}
+}
+@media(max-width:800px){.hero .medallion{right:16px;top:18px;opacity:.22}}

@@ -1,6 +1,6 @@
-import {watchProgress} from './live.mjs?v=2eb95282d484';
-import liveConfig from './live-config.mjs?v=2eb95282d484';
-import {renderCharacter} from './character.mjs?v=2eb95282d484';
+import {watchProgress} from './live.mjs?v=9a3d13774c16';
+import liveConfig from './live-config.mjs?v=9a3d13774c16';
+import {renderCharacter} from './character.mjs?v=9a3d13774c16';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,filter='active',view='overview',busy=false;
 const types={0:'Основные задания',1:'Основные задания',2:'Дополнительные задания',3:'Ведьмачьи заказы',4:'Поиск сокровищ',6:'Каменные сердца',7:'Кровь и вино'};
