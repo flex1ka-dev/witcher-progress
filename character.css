@@ -7,3 +7,6 @@
 .game-item.dismissed>.game-tooltip{display:none!important}
 
 .socket-group-body.mutation-slots{display:block}.mutation-slots .skill-sockets{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+.geralt-silhouette{opacity:1}.geralt-drawing{display:block;width:100%;height:auto;border-radius:4px}
+.geralt-drawing{aspect-ratio:4/7;height:auto;object-fit:cover;object-position:45% center}
