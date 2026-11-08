@@ -40,3 +40,30 @@
 }
 @media(max-width:800px){.hero .medallion{right:16px;top:18px;opacity:.22}}
 
+.gwent-empty { padding: 1.25rem; }
+.gwent-modes, .gwent-factions { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.gwent-group { margin: 1.5rem 0; }
+.gwent-group h2 { margin: 0 0 .75rem; }
+.gwent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: .65rem;
+  align-items: start;
+}
+.gwent-card { border: 1px solid #424834; background: #1b2117; min-width: 0; }
+.gwent-card summary {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  gap: .65rem;
+  align-items: center;
+  min-height: 4rem;
+  padding: .65rem .8rem;
+  list-style: none;
+  cursor: pointer;
+}
+.gwent-card summary::-webkit-details-marker { display: none; }
+.gwent-card strong, .gwent-description { overflow-wrap: anywhere; }
+.gwent-card strong { white-space: pre-line; }
+.gwent-card small, .gwent-symbol { color: #d3bd8d; }
+.gwent-symbol { text-align: center; font-size: 1.25rem; }
+.gwent-description { margin: 0; padding: .75rem .8rem; border-top: 1px solid #424834; white-space: pre-line; }

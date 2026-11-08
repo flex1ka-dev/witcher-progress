@@ -1,4 +1,5 @@
-import {parseTelemetry,decodeTelemetry,parseScriptLog} from './telemetry.mjs?v=73c5378b9bf7';
+import {renderGwent} from './gwent.mjs?v=5d135d975875';
+import {parseTelemetry,decodeTelemetry,parseScriptLog} from './telemetry.mjs?v=5d135d975875';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,folder=null,modified=0,lastStamp=null,lastSignal=0,mode='waiting',filter='active',events=[],busy=false,view='overview';
 const isLocal=['localhost','127.0.0.1'].includes(location.hostname);
@@ -11,7 +12,7 @@ const worldName=w=>worlds[w]||w||'Континент';
 const statusName=s=>({active:'В процессе',completed:'Завершён',failed:'Провален',inactive:'Неактивен'})[s]||s;
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
 function notify(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('toast').hidden=true,5500);}
-function navigate(next){view=next;document.querySelectorAll('.view').forEach(e=>e.hidden=e.id!==next+'-view');document.querySelectorAll('.nav').forEach(e=>e.classList.toggle('active',e.dataset.view===next));$('view-name').textContent=({overview:'Обзор пути',quests:'Журнал квестов',character:'Персонаж',connection:'Подключение'})[next];if(next==='quests')renderQuests();if(next==='character')renderCharacter();window.scrollTo({top:0,behavior:'instant'});}
+function navigate(next){view=next;document.querySelectorAll('.view').forEach(e=>e.hidden=e.id!==next+'-view');document.querySelectorAll('.nav').forEach(e=>e.classList.toggle('active',e.dataset.view===next));$('view-name').textContent=({overview:'Обзор пути',quests:'Журнал квестов',character:'Персонаж',gwent:'Гвинт',connection:'Подключение'})[next];if(next==='quests')renderQuests();if(next==='character')renderCharacter();window.scrollTo({top:0,behavior:'instant'});}
 document.querySelectorAll('[data-view]').forEach(e=>e.onclick=()=>navigate(e.dataset.view));
 document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>navigate(e.dataset.go));
 $('settings').onclick=()=>navigate('connection');
@@ -40,7 +41,7 @@ function render(){
   for(const k of ['health','stamina','toxicity']){$(k+'-label').textContent=`${fmt(d[k])} / ${fmt(d[k+'Max'])}`;bar(k+'-bar',d[k],d[k+'Max']);}
   const list=events.slice(0,6).map(e=>{const row=el('div','event');row.append(el('span','',e.text),el('small','',e.time.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})));return row;});
   if(list.length)$('events').replaceChildren(...list);
-  if(view==='quests')renderQuests();if(view==='character')renderCharacter();renderConnection();
+  if(view==='quests')renderQuests();if(view==='character')renderCharacter();renderGwent(state);renderConnection();
 }
 function renderConnection(){
   const freshness=isGitHub?15*60*1000:12000;
