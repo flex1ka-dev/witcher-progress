@@ -39,3 +39,9 @@
   .hero-copy{padding-inline-end:56px}
 }
 @media(max-width:800px){.hero .medallion{right:16px;top:18px;opacity:.22}}
+
+.spoiler-toggle{padding:7px 10px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--text);font-size:11px;line-height:1.4;white-space:nowrap}
+.spoiler-toggle[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:#252b20}
+.spoiler-notice{margin-block:16px;padding:14px 16px;border:1px solid var(--line);border-radius:5px;background:var(--bg)}
+.spoiler-notice p{margin:0 0 10px}
+@media(max-width:420px){.topbar{flex-wrap:wrap}.top-actions{margin-inline-start:auto}.spoiler-toggle{padding:6px 8px}}

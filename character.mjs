@@ -1,4 +1,4 @@
-import assets from './character-assets.mjs?v=9a3d13774c16';
+import assets from './character-assets.mjs?v=faa5365e43f2';
 const plain=t=>String(t||'').replace(/<br\s*\/?\s*>/gi,'\n').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ');
 const colorNames={red:'Фехтование',blue:'Знаки',green:'Алхимия',yellow:'Общие умения'};
 let lastBuild='',activeTab='skills',treeColor='all',root,tooltipId=0;
