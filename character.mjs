@@ -1,4 +1,5 @@
-import assets from './character-assets.mjs?v=efde47c095b7';
+import assets from './character-assets.mjs?v=73c5378b9bf7';
+import {loadEquipmentIcon} from './equipment-art.mjs?v=73c5378b9bf7';
 const plain=t=>String(t||'').replace(/<br\s*\/?\s*>/gi,'\n').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ');
 const colorNames={red:'Фехтование',blue:'Знаки',green:'Алхимия',yellow:'Общие умения'};
 let lastBuild='',activeTab='skills',treeColor='all',root,tooltipId=0;
@@ -12,7 +13,15 @@ function picture(item,kind){
  }
  if(!src&&kind==='equipment'&&/Школы Грифона/.test(item.title)&&!/улучш|отлич|мастер|гроссмейстер/i.test(item.title))src=assets[({'Стальной меч':'griffin-steel-sword','Серебряный меч':'griffin-silver-sword','Доспех':'griffin-armor','Перчатки':'griffin-gauntlets','Штаны':'griffin-trousers','Сапоги':'griffin-boots'})[item.slot]];
  const svg=el('span','item-symbol');const paths=kind==='mutagen'?'<path d="m40 5 25 20-8 41-17 13-21-17-5-32Z"/><path d="m40 5-8 30 8 44 9-45Z"/>':kind==='equipment'?({'Стальной меч':'<path d="m43 4 8 12-9 42-5 3-11-3 8-43Z"/><path d="m20 54 34 9M34 60l-4 18M23 79l14 1"/>','Серебряный меч':'<path d="m43 4 8 12-9 42-5 3-11-3 8-43Z"/><path d="m20 54 34 9M34 60l-4 18M23 79l14 1"/>','Доспех':'<path d="m26 10 14 8 14-8 18 16-13 15-6-5 5 40H22l5-40-6 5L8 26Z"/><path d="M40 20v51M24 40h32"/>','Перчатки':'<path d="M24 73 18 44 8 30l8-8 12 14-4-25 9-3 6 26 2-28 9 1-1 29 8-23 8 5-11 32-1 23Z"/>','Штаны':'<path d="M21 10h38l-3 30 5 36H45L40 43l-5 33H19l5-36Z"/><path d="M22 20h36"/>','Сапоги':'<path d="M23 7h34l-4 46 16 14v10H19V64l6-11Z"/><path d="M23 19h30M22 68h44"/>','Арбалет':'<path d="m20 65 39-47M8 26q29-25 62 13M10 27l42 2 16 10M44 31 32 18"/>'})[item.slot]||'<path d="m40 6 28 34-28 34L12 40Z"/>':item.color==='blue'?'<path d="m40 10 28 53H12Z"/><path d="M25 47h30"/>':item.color==='green'?'<path d="M30 6h20M35 7v24L14 66q0 10 26 10t26-10L45 31V7M23 53h34"/>':item.color==='red'?'<path d="m49 6 8 14-18 39-14-7 19-40ZM20 49l25 14M28 58 18 76"/>':'<path d="m40 8 9 22 24 9-24 9-9 25-9-25-24-9 24-9Z"/>';
- svg.innerHTML='<svg viewBox="0 0 80 84" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">'+paths+'</svg>';if(!src)return svg;
+ svg.innerHTML='<svg viewBox="0 0 80 84" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">'+paths+'</svg>';
+ if(!src&&kind==='equipment'){
+  loadEquipmentIcon(item).then(url=>{
+   if(!url||!svg.isConnected)return;
+   const image=el('img','item-art');image.alt='';image.decoding='async';
+   image.addEventListener('load',()=>{if(svg.isConnected)svg.replaceWith(image);},{once:true});image.src=url;
+  });
+ }
+ if(!src)return svg;
  const image=el('img','item-art');image.alt='';image.loading='lazy';image.addEventListener('error',()=>image.replaceWith(svg),{once:true});image.src=src;return image;
 }
 function statRows(stats){const dl=el('dl','item-stats');for(const stat of stats||[]){dl.append(el('dt','',plain(stat.label)),el('dd','',plain(stat.value)));}return dl;}

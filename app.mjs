@@ -1,4 +1,4 @@
-import {parseTelemetry,decodeTelemetry,parseScriptLog} from './telemetry.mjs?v=efde47c095b7';
+import {parseTelemetry,decodeTelemetry,parseScriptLog} from './telemetry.mjs?v=73c5378b9bf7';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,folder=null,modified=0,lastStamp=null,lastSignal=0,mode='waiting',filter='active',events=[],busy=false,view='overview';
 const isLocal=['localhost','127.0.0.1'].includes(location.hostname);
