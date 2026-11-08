@@ -1,25 +1,20 @@
-import {watchProgress} from './live.mjs?v=faa5365e43f2';
-import liveConfig from './live-config.mjs?v=faa5365e43f2';
-import {renderCharacter} from './character.mjs?v=faa5365e43f2';
+import {watchProgress} from './live.mjs?v=efde47c095b7';
+import liveConfig from './live-config.mjs?v=efde47c095b7';
+import {renderCharacter} from './character.mjs?v=efde47c095b7';
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('ru-RU').format(Math.round(n));
 let state=null,filter='active',view='overview',busy=false;
-const spoilerKey='witcher-path:no-spoilers';
-let noSpoilers=false, revealed=null;
-try{noSpoilers=localStorage.getItem(spoilerKey)==='1';}catch{}
-const concealed=section=>noSpoilers&&revealed!==section;
 const types={0:'Основные задания',1:'Основные задания',2:'Дополнительные задания',3:'Ведьмачьи заказы',4:'Поиск сокровищ',6:'Каменные сердца',7:'Кровь и вино'};
 const worlds={AN_NMLandNovigrad:'Велен и Новиград',AN_Velen:'Велен',AN_Kaer_Morhen:'Каэр Морхен',AN_Prologue_Village:'Белый Сад',AN_Wyzima:'Вызима',AN_Skellige_ArdSkellig:'Скеллиге',AN_Bob:'Туссент',AN_Undefined:'Континент'};
 const names={active:'В процессе',completed:'Завершено',failed:'Провалено',inactive:'Неактивно'};
 const plain=t=>String(t||'').replace(/<br\s*\/?\s*>/gi,'\n').replace(/<[^>]*>/g,'');
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
 function world(q){return worlds[q?.world]||'Континент';}
-function navigate(next){if(next!==view){revealed=null;refreshSpoilers();}view=next;document.querySelectorAll('.view').forEach(n=>n.hidden=n.id!==next+'-view');document.querySelectorAll('.nav').forEach(n=>{n.classList.toggle('active',n.dataset.view===next);n.setAttribute('aria-current',n.dataset.view===next?'page':'false');});$('view-name').textContent=({overview:'Обзор пути',quests:'Журнал квестов',character:'Персонаж'})[next];window.scrollTo(0,0);}
+function navigate(next){view=next;document.querySelectorAll('.view').forEach(n=>n.hidden=n.id!==next+'-view');document.querySelectorAll('.nav').forEach(n=>{n.classList.toggle('active',n.dataset.view===next);n.setAttribute('aria-current',n.dataset.view===next?'page':'false');});$('view-name').textContent=({overview:'Обзор пути',quests:'Журнал квестов',character:'Персонаж'})[next];window.scrollTo(0,0);}
 document.querySelectorAll('[data-view]').forEach(n=>n.onclick=()=>navigate(n.dataset.view));document.querySelectorAll('[data-go]').forEach(n=>n.onclick=()=>navigate(n.dataset.go));
 document.querySelectorAll('[data-filter]').forEach(n=>n.onclick=()=>{filter=n.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>{b.classList.toggle('selected',b===n);b.setAttribute('aria-pressed',String(b===n));});renderQuests();});
 $('search').oninput=renderQuests;$('type-filter').onchange=renderQuests;
 function tasks(list){const ul=el('ul','task-list');for(const t of list||[])ul.append(el('li',typeof t==='string'?'active':t.status,plain(typeof t==='string'?t:t.title)));return ul;}
 function renderQuests(){
- if(concealed('quests')){$('quest-list').replaceChildren();return;}
  const open=new Set([...document.querySelectorAll('.quest-entry[open]')].map(n=>n.dataset.id));
  const query=$('search').value.toLocaleLowerCase('ru'),type=$('type-filter').value;
  const rows=(state?.quests||[]).filter(q=>(filter==='all'||q.status===filter)&&q.title.toLocaleLowerCase('ru').includes(query)&&(type==='all'||type==='main'&&[0,1].includes(q.type)||String(q.type)===type));
@@ -36,28 +31,12 @@ function renderQuests(){
 }
 function buildSection(title,items,kind){const section=el('section','panel build-section');section.append(el('h2','',title));if(!items){section.append(el('p','waiting','Данные появятся после следующей загрузки сохранения с обновлённым модом.'));return section;}if(!items.length){section.append(el('p','waiting','Ничего не выбрано.'));return section;}const grid=el('div','build-grid');for(const item of items){const card=el('article','build-item '+String(item.color||''));card.append(el('small','',kind==='equipment'?item.slot:'Группа '+item.group),el('strong','',item.title));if(item.level)card.append(el('small','','Уровень '+item.level+(item.maxLevel?' / '+item.maxLevel:'')));grid.append(card);}section.append(grid);return section;}
 function render(){const d=state,tracked=d.quests.find(q=>q.id===d.trackedId);$('level').textContent=fmt(d.level);$('xp-label').textContent=fmt(d.xp)+' / '+fmt(d.xpNext)+' XP';$('xp-bar').style.width=Math.min(100,d.xp/Math.max(1,d.xpNext)*100)+'%';
- $('hero-description').textContent='Уровень и опыт Геральта';$('hero-location').textContent=concealed('overview')?'':'◇ '+world(tracked);$('hero-source').textContent='';
+ $('hero-description').textContent='Уровень и опыт Геральта';$('hero-location').textContent='◇ '+world(tracked);$('hero-source').textContent='';
  for(const [id,value] of [['completed',d.quests.filter(q=>q.status==='completed').length],['active',d.quests.filter(q=>q.status==='active').length],['crowns',d.crowns],['skills',d.skillPoints]])$(id).textContent=fmt(value);
  $('quest-summary').textContent='Из '+d.quests.length+' открытых заданий';$('nav-count').textContent=d.quests.filter(q=>q.status==='active').length;
- if(concealed('overview')){for(const id of ['tracked-title','tracked-type','tracked-world','objectives'])$(id).replaceChildren();}
- else{$('tracked-title').textContent=tracked?.title||'Задание не выбрано';$('tracked-type').textContent=tracked?(types[tracked.type]||'Задание'):'ТЕКУЩАЯ ЦЕЛЬ';$('tracked-world').textContent=tracked?world(tracked)+(tracked.level?' · Уровень '+tracked.level:''):'В игровом журнале нет отслеживаемого задания.';$('objectives').replaceChildren(...(d.objectives||[]).map(t=>el('li','',plain(t))));}
+ $('tracked-title').textContent=tracked?.title||'Задание не выбрано';$('tracked-type').textContent=tracked?(types[tracked.type]||'Задание'):'ТЕКУЩАЯ ЦЕЛЬ';$('tracked-world').textContent=tracked?world(tracked)+(tracked.level?' · Уровень '+tracked.level:''):'В игровом журнале нет отслеживаемого задания.';$('objectives').replaceChildren(...(d.objectives||[]).map(t=>el('li','',plain(t))));
  for(const b of document.querySelectorAll('[data-filter]')){const n=b.dataset.filter;b.textContent=({active:'Активные',completed:'Завершённые',failed:'Проваленные',all:'Все'})[n]+' · '+d.quests.filter(q=>n==='all'||q.status===n).length;}
  renderCharacter(d);renderQuests();}
-function refreshSpoilers(){
- $('spoiler-toggle').setAttribute('aria-pressed',String(noSpoilers));
- for(const [section,notice,details,label] of [['overview','goal-spoiler','goal-details','цель'],['quests','journal-spoiler','journal-details','журнал']]){
-  $(notice).hidden=!noSpoilers;$(details).hidden=concealed(section);
-  const button=$(notice).querySelector('button');
-  button.setAttribute('aria-expanded',String(!concealed(section)));
-  button.textContent=(concealed(section)?'Показать ':'Скрыть ')+label;
-  $(notice).querySelector('p').hidden=!concealed(section);
- }
- if(state)render();
-}
-$('spoiler-toggle').hidden=false;
-$('spoiler-toggle').onclick=()=>{noSpoilers=!noSpoilers;revealed=null;try{localStorage.setItem(spoilerKey,noSpoilers?'1':'0');}catch{}refreshSpoilers();};
-document.querySelectorAll('[data-reveal]').forEach(button=>button.onclick=()=>{revealed=revealed===button.dataset.reveal?null:button.dataset.reveal;refreshSpoilers();});
-refreshSpoilers();
 function status(text,error=false){const box=$('viewer-status');box.classList.toggle('error',error);box.replaceChildren(el('span','',text));if(error){const retry=el('button','','Повторить');retry.onclick=poll;box.append(retry);}}
 async function poll(){if(busy)return;busy=true;try{const r=await fetch(document.documentElement.dataset.stateEndpoint||'progress.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('HTTP '+r.status);const body=await r.json();if(!body.data||!Array.isArray(body.data.quests))throw Error('Нет данных');state=body.data;render();const date=new Date(body.modified);status('Данные из игры: '+date.toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'. Обновляются примерно раз в 10 минут во время игры.');}catch{status(state?'Не удалось проверить обновления. Показаны сохранённые данные.':'Не удалось загрузить прохождение. Попробуй ещё раз.',true);}finally{busy=false;}}
 document.querySelector('.page-heading p').textContent='Квесты, прокачка и снаряжение — для тех, кто следит за приключением.';
